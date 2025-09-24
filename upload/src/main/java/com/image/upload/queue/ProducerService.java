@@ -1,6 +1,6 @@
 package com.image.upload.queue;
 
-import com.image.upload.event.CreateMetadataRequest;
+import com.image.upload.event.Event;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -11,10 +11,10 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class ProducerService {
 	private final KafkaTemplate<String, Object> kafkaTemplate;
-	private static final String TOPIC_NAME = "image-metadata-event";
+	// TODO: 나중에 env로?
 
-	void sendMetadataEvent(CreateMetadataRequest request) {
-		log.info("Sending metadata event to Kafka. title: {}", request.getTitle());
-		kafkaTemplate.send(TOPIC_NAME, request);
+	public void sendMessage(TopicName topic, Event event) {
+		kafkaTemplate.send(topic.getTopic(), event.getId(), event);
+		log.info("Produced message to topic: {}, payload: {}", topic, event);
 	}
 }
