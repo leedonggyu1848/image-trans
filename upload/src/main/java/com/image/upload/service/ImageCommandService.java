@@ -40,7 +40,7 @@ public class ImageCommandService {
 				.accessKey(accessKey)
 				.resolution(resolution)
 				.build();
-		producerService.sendMessage(TopicName.TOPIC_CREATE, event);
+		producerService.sendMessage(TopicName.TOPIC_CREATE_OBJ, event);
 	}
 
 	private void sendCreatedImgSource(UUID imgUuid, String title) {
@@ -48,6 +48,6 @@ public class ImageCommandService {
 				.imgUuid(imgUuid.toString())
 				.title(title)
 				.build();
-		producerService.sendMessage(TopicName.TOPIC_CREATE, event);
+		producerService.sendMessage(TopicName.TOPIC_CREATE_SRC, event);
 	}
 }

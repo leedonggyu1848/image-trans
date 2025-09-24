@@ -1,9 +1,24 @@
 spring:
   application:
     name: upload
+  kafka:
+    bootstrap-servers: localhost:9095
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+    consumer:
+      group-id: my-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*" # "*"? ?? ???? ?? (???), ????? ?? ??? ??
 
 minio:
   url: "http://127.0.0.1:9000"
   access-key: "minioadmin"
   secret-key: "minioadmin"
-  bucket: "image-bucket" # ???? ??? ?? ??
+  bucket: "image-bucket"
+

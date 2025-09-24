@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @Log4j2
 @RestController
-@RequestMapping("/commands")
+@RequestMapping("/command")
 public class CommandController {
 	private final ImageCommandService imageCommandService;
 

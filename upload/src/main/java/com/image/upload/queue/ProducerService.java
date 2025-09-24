@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class ProducerService {
 	private final KafkaTemplate<String, Object> kafkaTemplate;
-	// TODO: 나중에 env로?
 
 	public void sendMessage(TopicName topic, Event event) {
 		kafkaTemplate.send(topic.getTopic(), event.getId(), event);
