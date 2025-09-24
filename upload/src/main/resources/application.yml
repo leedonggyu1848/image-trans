@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: upload
+
+minio:
+  url: "http://127.0.0.1:9000"
+  access-key: "minioadmin"
+  secret-key: "minioadmin"
+  bucket: "image-bucket" # ???? ??? ?? ??
