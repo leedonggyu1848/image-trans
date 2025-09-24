@@ -2,7 +2,7 @@ spring:
   application:
     name: upload
   kafka:
-    bootstrap-servers: localhost:9095
+    bootstrap-servers: ${KAFKA_URL:localhost:9095}
 
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
@@ -17,8 +17,8 @@ spring:
         spring.json.trusted.packages: "*" # "*"? ?? ???? ?? (???), ????? ?? ??? ??
 
 minio:
-  url: "http://127.0.0.1:9000"
-  access-key: "minioadmin"
-  secret-key: "minioadmin"
-  bucket: "image-bucket"
+  url: ${MINIO_URL:localhost:9000}
+  access-key: ${MINIO_ROOT_USER:minioadmin}
+  secret-key: ${MINIO_ROOT_PASSWORD:minioadmin}
+  bucket: ${MINIO_BUCKET:image-bucket}
 
