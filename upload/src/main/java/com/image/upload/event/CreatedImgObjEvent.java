@@ -10,12 +10,12 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 public class CreatedImgObjEvent implements Event {
-	private final String imgUuid;
+	private final String imgId;
 	private final String accessKey;
 	private final String resolution;
 
 	@Override
 	public String getId() {
-		return imgUuid;
+		return imgId;
 	}
 }

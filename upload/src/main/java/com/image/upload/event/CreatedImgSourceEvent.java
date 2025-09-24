@@ -10,10 +10,10 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 public class CreatedImgSourceEvent implements Event {
-	private final String imgUuid;
+	private final String imgId;
 	private final String title;
 
 	public String getId() {
-		return imgUuid;
+		return imgId;
 	}
 }

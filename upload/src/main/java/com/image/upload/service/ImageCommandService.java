@@ -18,34 +18,34 @@ public class ImageCommandService {
 	private final ProducerService producerService;
 	private final String IMAGE_ORIGINAL = "ORIGINAL";
 
-	public void processOriginalImage(UUID imgUuid, String title, MultipartFile file) {
-		sendCreatedImgSource(imgUuid, title);
-		String accessKey = fileStorage.store(imgUuid, IMAGE_ORIGINAL, file);
+	public void processOriginalImage(UUID imgId, String title, MultipartFile file) {
+		sendCreatedImgSource(imgId, title);
+		String accessKey = fileStorage.store(imgId, IMAGE_ORIGINAL, file);
 
-		sendCreatedImgObj(imgUuid, accessKey, IMAGE_ORIGINAL);
-		sendTranscodeEvent(imgUuid, accessKey);
+		sendCreatedImgObj(imgId, accessKey, IMAGE_ORIGINAL);
+		sendTranscodeEvent(imgId, accessKey);
 	}
 
-	private void sendTranscodeEvent(UUID imgUuid, String accessKey) {
+	private void sendTranscodeEvent(UUID imgId, String accessKey) {
 		TranscodeEvent event = TranscodeEvent.builder()
-				.imgUuid(imgUuid.toString())
+				.imgId(imgId.toString())
 				.accessKey(accessKey)
 				.build();
 		producerService.sendMessage(TopicName.TOPIC_TRANSCODE, event);
 	}
 
-	private void sendCreatedImgObj(UUID imgUuid, String accessKey, String resolution) {
+	private void sendCreatedImgObj(UUID imgId, String accessKey, String resolution) {
 		CreatedImgObjEvent event = CreatedImgObjEvent.builder()
-				.imgUuid(imgUuid.toString())
+				.imgId(imgId.toString())
 				.accessKey(accessKey)
 				.resolution(resolution)
 				.build();
 		producerService.sendMessage(TopicName.TOPIC_CREATE_OBJ, event);
 	}
 
-	private void sendCreatedImgSource(UUID imgUuid, String title) {
+	private void sendCreatedImgSource(UUID imgId, String title) {
 		CreatedImgSourceEvent event = CreatedImgSourceEvent.builder()
-				.imgUuid(imgUuid.toString())
+				.imgId(imgId.toString())
 				.title(title)
 				.build();
 		producerService.sendMessage(TopicName.TOPIC_CREATE_SRC, event);
