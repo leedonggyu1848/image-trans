@@ -1,1 +1,4 @@
 /kafka
+.DS_Store
+.gradle
+.idea
