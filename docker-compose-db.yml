@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  rdbms:
+    image: mysql:8.0
+    container_name: rdbms
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${RDB_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${RDB_DATABASE:-testdb}
+      MYSQL_USER: ${RDB_USER:-user}
+      MYSQL_PASSWORD: ${RDB_PASSWORD:-pw}
+    ports:
+      - "${RDB_PORT-3306}:3306"
+    volumes:
+      - ./db/data:/var/lib/mysql
