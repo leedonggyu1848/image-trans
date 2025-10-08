@@ -1,6 +1,8 @@
-/kafka
 .DS_Store
 .gradle
 .idea
-/minio-data
 .vim
+
+/kafka
+/minio-data
+/db
