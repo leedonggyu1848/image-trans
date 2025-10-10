@@ -16,6 +16,11 @@ type FileObject struct {
 	ContentType string
 }
 
+func (f FileObject) Close() {
+	f.Reader.(io.Closer).Close()
+}
+
+
 type ObjectStorage interface {
 	Upload(ctx context.Context, imgId string, resolution string, file FileObject) (string, error)
 	Get(ctx context.Context, accessKey string) (FileObject, error)
