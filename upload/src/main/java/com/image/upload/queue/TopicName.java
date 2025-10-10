@@ -1,18 +1,12 @@
 package com.image.upload.queue;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
 public enum TopicName {
 	TOPIC_TRANSCODE("transcode"),
-	TOPIC_CREATE_OBJ("create-img"),
-	TOPIC_CREATE_SRC("create-src");
-
-
+	TOPIC_CREATE_OBJ("create-img");
 	private final String topic;
-
-	TopicName(String topic) {
-		this.topic = topic;
-	}
-
-	public String getTopic() {
-		return topic;
-	}
 }

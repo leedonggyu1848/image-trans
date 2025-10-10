@@ -1,7 +1,6 @@
 package com.image.upload.service;
 
 import com.image.upload.event.CreatedImgObjEvent;
-import com.image.upload.event.CreatedImgSourceEvent;
 import com.image.upload.event.TranscodeEvent;
 import com.image.upload.queue.ProducerService;
 import com.image.upload.queue.TopicName;
@@ -19,10 +18,9 @@ public class ImageCommandService {
 	private final String IMAGE_ORIGINAL = "ORIGINAL";
 
 	public void processOriginalImage(UUID imgId, String title, MultipartFile file) {
-		sendCreatedImgSource(imgId, title);
 		String accessKey = fileStorage.store(imgId, IMAGE_ORIGINAL, file);
 
-		sendCreatedImgObj(imgId, accessKey, IMAGE_ORIGINAL);
+		sendCreatedImgObj(imgId, accessKey, IMAGE_ORIGINAL, title);
 		sendTranscodeEvent(imgId, accessKey);
 	}
 
@@ -34,20 +32,13 @@ public class ImageCommandService {
 		producerService.sendMessage(TopicName.TOPIC_TRANSCODE, event);
 	}
 
-	private void sendCreatedImgObj(UUID imgId, String accessKey, String resolution) {
+	private void sendCreatedImgObj(UUID imgId, String accessKey, String resolution, String title) {
 		CreatedImgObjEvent event = CreatedImgObjEvent.builder()
 				.imgId(imgId.toString())
 				.accessKey(accessKey)
 				.resolution(resolution)
-				.build();
-		producerService.sendMessage(TopicName.TOPIC_CREATE_OBJ, event);
-	}
-
-	private void sendCreatedImgSource(UUID imgId, String title) {
-		CreatedImgSourceEvent event = CreatedImgSourceEvent.builder()
-				.imgId(imgId.toString())
 				.title(title)
 				.build();
-		producerService.sendMessage(TopicName.TOPIC_CREATE_SRC, event);
+		producerService.sendMessage(TopicName.TOPIC_CREATE_OBJ, event);
 	}
 }

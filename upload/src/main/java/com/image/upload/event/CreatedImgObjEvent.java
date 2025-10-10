@@ -13,6 +13,7 @@ public class CreatedImgObjEvent implements Event {
 	private final String imgId;
 	private final String accessKey;
 	private final String resolution;
+	private final String title;
 
 	@Override
 	public String getId() {
