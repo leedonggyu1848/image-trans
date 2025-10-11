@@ -1,12 +1,15 @@
 package com.image.upload.queue;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
-@Getter
-@AllArgsConstructor
-public enum TopicName {
-	TOPIC_TRANSCODE("transcode"),
-	TOPIC_CREATE_OBJ("create-img");
-	private final String topic;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
+@Getter @Setter
+@Component
+@ConfigurationProperties(prefix = "topic")
+public class TopicName {
+	private String created;
+	private String transcode;
 }

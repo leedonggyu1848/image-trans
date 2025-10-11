@@ -1,0 +1,5 @@
+rootProject.name = "image-trans"
+include 'upload'
+include 'download'
+include 'common-event'
+

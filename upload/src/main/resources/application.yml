@@ -1,23 +1,18 @@
+topic:
+  created: ${CREATED_TOPIC:create-img}
+  transcode: ${TRANSCODE_TOPIC:transcode}
 spring:
   application:
     name: upload
   kafka:
-    bootstrap-servers: ${KAFKA_URL:localhost:9095}
+    bootstrap-servers: ${KAFKA_URL:localhost:9093}
 
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
-    consumer:
-      group-id: upload-group
-      auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-      properties:
-        spring.json.trusted.packages: "*"
-
 minio:
-  url: ${MINIO_URL:localhost:9000}
+  url: ${MINIO_URL:http://localhost:9000}
   access-key: ${MINIO_ROOT_USER:minioadmin}
   secret-key: ${MINIO_ROOT_PASSWORD:minioadmin}
   bucket: ${MINIO_BUCKET:image-bucket}

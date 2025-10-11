@@ -1,8 +1,8 @@
 package com.image.download.queue;
 
-import com.image.download.event.CreatedImgObjEvent;
 import com.image.download.store.Metadata;
 import com.image.download.store.MetadataRepository;
+import com.image.event.CreatedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -16,9 +16,13 @@ public class ConsumerService {
 	private final MetadataRepository metadataRepository;
 
 	@Transactional
-	@KafkaListener(topics = "create-img", groupId = "your-group-id")
-	public void consume(CreatedImgObjEvent event) {
+	@KafkaListener(topics = "${topic.created}", groupId = "${spring.kafka.consumer.group-id}")
+	public void consume(CreatedEvent event) {
 		log.info("Consumed message -> {}", event);
+		if (metadataRepository.existsByImgIdAndResolution(event.getImgId(), event.getResolution())) {
+			log.info("Metadata with imgId {} already exists. Skipping...", event.getImgId());
+			return;
+		}
 		Metadata metadata = Metadata.builder()
 				.imgId(event.getImgId())
 				.accessKey(event.getAccessKey())

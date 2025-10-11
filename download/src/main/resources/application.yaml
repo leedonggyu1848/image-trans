@@ -1,3 +1,5 @@
+topic:
+  created: ${CREATED_TOPIC:create-img}
 spring:
   application:
     name: download
@@ -6,8 +8,7 @@ spring:
     cache-names:
       - preSignedUrls
     caffeine:
-      spec: >
-        preSignedUrls=expireAfterWrite=290s
+      spec: expireAfterWrite=290s
   datasource:
     url: jdbc:${RDB_URL:mysql://localhost:3306/testdb}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: ${RDB_USER:user}
@@ -15,22 +16,27 @@ spring:
     driver-class-name: ${RDB_DRIVER_CLASS:com.mysql.cj.jdbc.Driver}
   jpa:
     hibernate:
-      ddl-auto: ${RDB_DDL:create-drop}
+      ddl-auto: ${RDB_DDL:update}
     properties:
       hibernate:
         format_sql: true
 
   kafka:
-    bootstrap-servers: ${KAFKA_URL:localhost:9095}
-
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    bootstrap-servers: ${KAFKA_URL:localhost:9093}
 
     consumer:
-      group-id: upload-group
+      group-id: download-group
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
+        spring.json.value.default.type: com.image.event.CreatedEvent
         spring.json.trusted.packages: "*"
+
+minio:
+  url: ${MINIO_URL:http://localhost:9000}
+  access-key: ${MINIO_ROOT_USER:minioadmin}
+  secret-key: ${MINIO_ROOT_PASSWORD:minioadmin}
+  bucket: ${MINIO_BUCKET:image-bucket}
+server:
+  port: ${PORT:8081}

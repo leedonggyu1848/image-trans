@@ -61,7 +61,7 @@ func GetKafkaConfig() KafkaConfig {
         slog.Info("Loading Kafka configuration from environment variables")
         kafkaConfig = &KafkaConfig{
             URL:     getEnv("KAFKA_URL", "localhost:9093"),
-            GroupId: getEnv("KAFKA_GROUP_ID", "transcoder-group5"),
+            GroupId: getEnv("KAFKA_GROUP_ID", "transcoder-group"),
         }
     }
 

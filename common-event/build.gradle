@@ -1,0 +1,27 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.image'
+version = '1.0-SNAPSHOT'
+
+ext {
+    lombokVersion = '1.18.42'
+    jacskonVersion = '3.0.0'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation "tools.jackson.core:jackson-databind:${jacskonVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+test {
+    useJUnitPlatform()
+}

@@ -1,7 +1,7 @@
 package com.image.upload.service;
 
-import com.image.upload.event.CreatedImgObjEvent;
-import com.image.upload.event.TranscodeEvent;
+import com.image.event.CreatedEvent;
+import com.image.event.TranscodeEvent;
 import com.image.upload.queue.ProducerService;
 import com.image.upload.queue.TopicName;
 import com.image.upload.store.FileStorage;
@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class ImageCommandService {
 	private final FileStorage fileStorage;
 	private final ProducerService producerService;
+	private final TopicName topicName;
 	private final String IMAGE_ORIGINAL = "ORIGINAL";
 
 	public void processOriginalImage(UUID imgId, String title, MultipartFile file) {
@@ -29,16 +30,16 @@ public class ImageCommandService {
 				.imgId(imgId.toString())
 				.accessKey(accessKey)
 				.build();
-		producerService.sendMessage(TopicName.TOPIC_TRANSCODE, event);
+		producerService.sendMessage(topicName.getTranscode(), event);
 	}
 
 	private void sendCreatedImgObj(UUID imgId, String accessKey, String resolution, String title) {
-		CreatedImgObjEvent event = CreatedImgObjEvent.builder()
+		CreatedEvent event = CreatedEvent.builder()
 				.imgId(imgId.toString())
 				.accessKey(accessKey)
 				.resolution(resolution)
 				.title(title)
 				.build();
-		producerService.sendMessage(TopicName.TOPIC_CREATE_OBJ, event);
+		producerService.sendMessage(topicName.getCreated(), event);
 	}
 }
