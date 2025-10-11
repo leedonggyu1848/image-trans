@@ -16,8 +16,6 @@ import (
 
 
 func main() {
-	const transcodeTopicName = "transcode"
-	const createdTopicName = "create-img"
 
 	cfg := config.GetConfig()
 	eventReader, err := store.NewKafkaEventReader[event.TranscodeEvent](config.GetKafkaConfig(), cfg.TranscodeTopicName)

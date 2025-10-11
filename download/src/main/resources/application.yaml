@@ -2,6 +2,12 @@ spring:
   application:
     name: download
 
+  cache:
+    cache-names:
+      - preSignedUrls
+    caffeine:
+      spec: >
+        preSignedUrls=expireAfterWrite=290s
   datasource:
     url: jdbc:${RDB_URL:mysql://localhost:3306/testdb}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: ${RDB_USER:user}
