@@ -9,9 +9,9 @@ import (
 
 var (
     once sync.Once
-    minioConfig  MinioConfig
-    kafkaConfig  KafkaConfig
-    config       Config
+    minioConfig  *MinioConfig
+    kafkaConfig  *KafkaConfig
+    config       *Config
 )
 
 type MinioConfig struct {
@@ -41,33 +41,36 @@ func getEnv(key, fallback string) string {
 }
 
 func GetMinioConfig() MinioConfig {
-	once.Do(func() {
+    slog.Info("called GetMinioConfig")
+    if minioConfig == nil {
         slog.Info("Loading Minio configuration from environment variables")
-		minioConfig = MinioConfig{
+		minioConfig = &MinioConfig{
 			URL:             getEnv("MINIO_URL", "localhost:9000"),
 			AccessKeyID:     getEnv("MINIO_ROOT_USER", "minioadmin"),
 			SecretAccessKey: getEnv("MINIO_ROOT_PASSWORD", "minioadmin"),
 			BucketName:      getEnv("MINIO_BUCKET", "image-bucket"),
 		}
-	})
+    }
 
-	return minioConfig
+	return *minioConfig
 }
 
 func GetKafkaConfig() KafkaConfig {
-    once.Do(func() {
+    slog.Info("called GetKafkaConfig")
+    if kafkaConfig == nil {
         slog.Info("Loading Kafka configuration from environment variables")
-        kafkaConfig = KafkaConfig{
-            URL:     getEnv("KAFKA_URL", "localhost:9095"),
-            GroupId: getEnv("KAFKA_GROUP_ID", "transcoder-group"),
+        kafkaConfig = &KafkaConfig{
+            URL:     getEnv("KAFKA_URL", "localhost:9093"),
+            GroupId: getEnv("KAFKA_GROUP_ID", "transcoder-group5"),
         }
-    })
+    }
 
-    return kafkaConfig
+    return *kafkaConfig
 }
 
 func GetConfig() Config {
-    once.Do(func() {
+    slog.Info("called Config")
+    if config == nil {
         slog.Info("Loading application configuration from environment variables")
         nWorker, err := strconv.Atoi(getEnv("WORKER_COUNT", "5"))
         if err != nil {
@@ -79,13 +82,12 @@ func GetConfig() Config {
             slog.Warn("Invalid JOB_QUEUE_SIZE value, defaulting to 100", "error", err)
             nJob = 100
         }
-
-        config = Config{
+        config = &Config{
             WorkerCount: nWorker,
             JobCount: nJob,
             TranscodeTopicName: getEnv("TRANSCODE_TOPIC", "transcode"),
             CreatedTopicName: getEnv("CREATED_TOPIC", "create-img"),
         }
-    })
-    return config
+    }
+    return *config
 }

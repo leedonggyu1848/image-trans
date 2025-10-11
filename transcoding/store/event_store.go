@@ -18,6 +18,7 @@ type KafkaEventReader[T any] struct {
 
 func testConnection(url string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	slog.Info("try to connect to kafka", "url", url)
 	defer cancel()
 	conn, err := kafka.DialContext(ctx, "tcp", url)
 	if err != nil {

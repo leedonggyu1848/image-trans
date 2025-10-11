@@ -1,4 +1,4 @@
-package transcoding
+package main
 
 import (
 	"context"
@@ -52,7 +52,7 @@ func main() {
 	jobs := make(chan event.TranscodeEvent, cfg.JobCount)
 	for i := 0; i < cfg.WorkerCount; i++ {
 		wg.Add(1)
-		service.ProccessMessages(ctx, service.Worker{
+		go service.ProccessMessages(ctx, service.Worker{
 			Wg:            &wg,
 			Id:            i,
 			ObjectStorage: objectStorage,
@@ -62,6 +62,8 @@ func main() {
 	}
 
 	go func() {
+		slog.Info("starting main loop to fetch messages")
+		defer close(jobs)
 		for {
 			select {
 			case <-ctx.Done(): // Shutdown 신호가 오면 루프 종료
@@ -84,5 +86,6 @@ func main() {
 			}
 		}
 	}()
-
+	wg.Wait()
+	slog.Info("All workers have finished. Program shutting down.")
 }

@@ -14,10 +14,11 @@ type FileObject struct {
 	Reader      io.Reader
 	Size        int64
 	ContentType string
+	closer      *minio.Object
 }
 
 func (f FileObject) Close() {
-	f.Reader.(io.Closer).Close()
+	f.closer.Close()
 }
 
 
@@ -85,6 +86,7 @@ func (s *MinioFileStorage) Get(ctx context.Context, accessKey string) (FileObjec
 		Reader:      objectReader,
 		Size:        objInfo.Size,
 		ContentType: objInfo.ContentType,
+		closer:      objectReader,
 	}
 
 	return fileObj, nil

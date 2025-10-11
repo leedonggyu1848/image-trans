@@ -1,6 +1,8 @@
 module transcoding
 
-go 1.23.4
+go 1.24.0
+
+toolchain go1.24.8
 
 require (
 	github.com/minio/minio-go/v7 v7.0.95
@@ -24,5 +26,5 @@ require (
 	golang.org/x/crypto v0.39.0 // indirect
 	golang.org/x/net v0.41.0 // indirect
 	golang.org/x/sys v0.33.0 // indirect
-	golang.org/x/text v0.26.0 // indirect
+	golang.org/x/text v0.30.0 // indirect
 )
