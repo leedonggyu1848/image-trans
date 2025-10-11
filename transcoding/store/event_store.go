@@ -40,6 +40,7 @@ func NewKafkaEventReader[T any](cfg config.KafkaConfig, topicName string) (*Kafk
 		Topic:    topicName,
 		MinBytes: 10e3, // 10KB
 		MaxBytes: 10e6, // 10MB
+		StartOffset: kafka.FirstOffset,
 	})
 	return &KafkaEventReader[T]{
 		config: cfg,

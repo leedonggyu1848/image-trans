@@ -21,9 +21,6 @@ const api = {
     formData.append("title", title);
     formData.append("file", file);
 
-    // NOTE: fetch API does not support upload progress tracking out of the box.
-    // For a real-world scenario with progress bars, XMLHttpRequest or a library like Axios is recommended.
-    // This is a simplified version.
     const response = await fetch(`${UPLOAD_API_URL}/command`, {
       method: "POST",
       body: formData,
@@ -33,7 +30,6 @@ const api = {
       const errorBody = await response.text();
       throw new Error(`Upload failed: ${errorBody || response.statusText}`);
     }
-    // As the backend returns ResponseEntity.ok().build(), there's no body to parse.
     return { success: true };
   },
   getMetadata: async () => {
@@ -41,9 +37,9 @@ const api = {
     if (!response.ok) throw new Error("Failed to fetch metadata");
     return response.json();
   },
+  // 수정된 부분: 이미지 URL을 가져오는 대신, 이미지를 직접 스트리밍하는 엔드포인트를 호출하도록 변경
   getImageUrl: (imageId, resolution) => {
-    // 백엔드의 getImageUrl 엔드포인트를 직접 이미지 URL로 사용합니다.
-    return `${DOWNLOAD_API_URL}/query/images/url/${imageId}/${resolution}`;
+    return `${DOWNLOAD_API_URL}/query/images/${imageId}/${resolution}`;
   },
 };
 
@@ -104,7 +100,6 @@ const UploadForm = ({ onUploadSuccess }) => {
       );
       setTitle("");
       setFile(null);
-      // Reset file input
       e.target.reset();
     } catch (err) {
       setError(err.message);
@@ -213,8 +208,6 @@ const UploadForm = ({ onUploadSuccess }) => {
 };
 
 const ImageCard = ({ metadata, onImageSelect }) => {
-  // Use a low-resolution image for the gallery thumbnail to save bandwidth.
-  // We'll try resolutions in order of preference.
   const preferredThumbResolutions = ["480p", "720p", "1080p", "ORIGINAL"];
   const thumbResolution =
     metadata.resolutions.find((r) => preferredThumbResolutions.includes(r)) ||
@@ -358,13 +351,11 @@ export default function App() {
     setError(null);
     try {
       const metadataList = await api.getMetadata();
-      // Backend returns a list of lists of metadata, so we flatten it.
-      // And we group by imgId.
       const groupedByImgId = metadataList.flat().reduce((acc, meta) => {
         if (!acc[meta.imgId]) {
           acc[meta.imgId] = {
             imgId: meta.imgId,
-            title: meta.title, // Assume title is same for all resolutions of an image
+            title: meta.title,
             resolutions: [],
           };
         }
@@ -388,7 +379,6 @@ export default function App() {
 
   const handleUploadSuccess = (message) => {
     showNotification(message, "success");
-    // Wait a bit for the backend to process the image before refreshing
     setTimeout(fetchImages, 2000);
   };
 
@@ -489,6 +479,10 @@ export default function App() {
             ))}
         </div>
       </main>
+
+      <footer className="text-center py-6 text-gray-500 text-sm">
+        <p>Powered by Spring Boot & React. Designed by Gemini.</p>
+      </footer>
     </div>
   );
 }
