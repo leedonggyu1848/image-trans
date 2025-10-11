@@ -2,7 +2,6 @@ package transcoding
 
 import (
 	"context"
-	"log"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -75,14 +74,14 @@ func main() {
 					if ctx.Err() != nil {
 						return
 					}
-					slog.Info("could not fetch message: %v", err)
+					slog.Info("could not fetch message: ", "err", err)
 					continue
 				}
 				jobs <- *event // 작업을 작업 큐에 보냄
 
 				// 메시지를 처리했다고 Kafka에 알림 (offset commit)
 				if err := eventReader.CommitEvent(ctx, msg); err != nil {
-					log.Printf("failed to commit messages: %v", err)
+					slog.Info("failed to commit messages: ", "err", err)
 				}
 			}
 		}

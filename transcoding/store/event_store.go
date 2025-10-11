@@ -51,7 +51,7 @@ func (k *KafkaEventReader[T]) Close() error {
 	return k.reader.Close()
 }
 
-func (k *KafkaEventReader[T]) FetchEvent(ctx context.Context) (*T, *msg, error) {
+func (k *KafkaEventReader[T]) FetchEvent(ctx context.Context) (*T, *kafka.Message, error) {
 	m, err := k.reader.FetchMessage(ctx)
 	if err != nil {
 		if ctx.Err() != nil {
@@ -69,11 +69,11 @@ func (k *KafkaEventReader[T]) FetchEvent(ctx context.Context) (*T, *msg, error) 
 		slog.Error("failed to unmarshal message", "error", err, "value", string(m.Value))
 		return nil, nil, err
 	}
-	return &event, m, nil
+	return &event, &m, nil
 }
 
-func (k *KafkaEventReader[T]) CommitEvent(ctx context.Context, event kafka.Message) error {
-	return k.reader.CommitMessages(ctx, event)
+func (k *KafkaEventReader[T]) CommitEvent(ctx context.Context, event *kafka.Message) error {
+	return k.reader.CommitMessages(ctx, *event)
 }
 
 // kafka writer
@@ -107,10 +107,10 @@ func (k *KafkaEventWriter[T]) WriteEvent(ctx context.Context, event T) error {
 	}
 	err = k.writer.WriteMessages(ctx, kafka.Message{Value: eventBytes})
 	if err != nil {
-		slog.Info("failed to write message to kafka: %v", err)
+		slog.Info("failed to write message to kafka", "error", err)
 		return err
 	}
-	slog.Info("Successfully sent transcode completion message for %s", event.ObjectKey)
+	slog.Info("Successfully sent transcode completion", "messeage", event)
 	return nil
 }
 
