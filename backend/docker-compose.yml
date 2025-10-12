@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  transcoding:
+    container_name: transcoding
+    image: transcoding:local
+    env_file:
+      - ./.env.example
+    networks:
+      - image-network
+
+networks:
+  image-network:
+    external: true
+

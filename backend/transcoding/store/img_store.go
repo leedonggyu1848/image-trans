@@ -4,6 +4,7 @@ import (
 	"context"
 	"io"
 	"log/slog"
+	"time"
 	"transcoding/config"
 
 	"github.com/minio/minio-go/v7"
@@ -36,15 +37,27 @@ func generateAccessKey(imageId string, resolution string) string {
 	return imageId + "/" + resolution
 }
 
-func NewMinioFileStorage() (*MinioFileStorage, error) {
-	cfg := config.GetMinioConfig()
-
+func NewMinioFileStorage(cfg config.MinioConfig) (*MinioFileStorage, error) {
 	minioClient, err := minio.New(cfg.URL, &minio.Options{
 		Creds:  credentials.NewStaticV4(cfg.AccessKeyID, cfg.SecretAccessKey, ""),
 		Secure: false,
 	})
 	if err != nil {
 		return nil, err
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel() // 함수 종료 시 context 리소스 정리
+
+	state, err := minioClient.BucketExists(ctx, cfg.BucketName)
+	if err != nil {
+		return nil, err
+	}
+	if !state {
+		slog.Info("There is no bucket. Create new buket", "bucketName", cfg.BucketName)
+		err = minioClient.MakeBucket(ctx, cfg.BucketName, minio.MakeBucketOptions{})
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return &MinioFileStorage{

@@ -30,7 +30,7 @@ func main() {
 		return
 	}
 	defer eventWriter.Close()
-	objectStorage, err := store.NewMinioFileStorage()
+	objectStorage, err := store.NewMinioFileStorage(config.GetMinioConfig())
 	if err != nil {
 		slog.Error("Failed to initialize MinIO client", "error", err)
 		return
