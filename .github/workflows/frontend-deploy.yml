@@ -1,0 +1,36 @@
+name: Frontend Deploy
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "frontend/**"
+
+jobs:
+  s3_frontend_deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: React Build
+        run: |
+          npm install
+          npm run build
+        working-directory: frontend
+        env:
+          DOWNLOAD_API_URL: ${{ secrets.DOWNLOAD_API_URL }}
+          UPLOAD_API_URL: ${{ secrets.UPLOAD_API_URL }}
+
+      - name: Configure AWS Credentials with OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ap-northeast-2
+
+      - name: S3 upload
+        run: aws s3 sync build/ s3://${{ secrets.AWS_S3_FRONTEND_BUCKET }}
+        working-directory: frontend
