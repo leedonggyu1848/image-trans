@@ -10,9 +10,10 @@ import {
 } from "lucide-react";
 
 // --- Configuration ---
-const UPLOAD_API_URL = process.env.UPLOAD_API_URL || "http://localhost:8080";
+const UPLOAD_API_URL =
+  process.env.REACT_APP_UPLOAD_API_URL || "http://localhost:8080";
 const DOWNLOAD_API_URL =
-  process.env.DOWNLOAD_API_URL || "http://localhost:8081";
+  process.env.REACT_APP_DOWNLOAD_API_URL || "http://localhost:8081";
 
 // --- API Helper Functions ---
 const api = {
