@@ -11,12 +11,14 @@ import {
 
 // --- Configuration ---
 // 백엔드 서버의 주소를 여기에 입력하세요.
-const UPLOAD_API_URL = "http://localhost:8080";
-const DOWNLOAD_API_URL = "http://localhost:8081";
+
+const UPLOAD_API_URL = process.env.UPLOAD_API_URL || "http://localhost:8080";
+const DOWNLOAD_API_URL =
+  process.env.DOWNLOAD_API_URL || "http://localhost:8081";
 
 // --- API Helper Functions ---
 const api = {
-  uploadImage: async (title, file, onProgress) => {
+  uploadImage: async (title, file) => {
     const formData = new FormData();
     formData.append("title", title);
     formData.append("file", file);
