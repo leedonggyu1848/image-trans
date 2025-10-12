@@ -13,7 +13,6 @@ services:
 
   upload:
     image: leedong1848/image-upload:latest
-
     container_name: upload
     env_file:
       - ./.env.example
