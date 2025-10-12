@@ -1,5 +1,6 @@
 package com.image.upload.controller;
 
+import com.github.f4b6a3.ulid.UlidCreator;
 import com.image.upload.service.ImageCommandService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ public class CommandController {
 		if (file.isEmpty())
 			return ResponseEntity.badRequest().body("File is required");
 		log.info("Received command to upload image. title: {}", title);
-		UUID fileId = UUID.randomUUID();
+		String fileId = UlidCreator.getUlid().toString();
 		imageCommandService.processOriginalImage(fileId, title, file);
 		return ResponseEntity.ok().build();
 	}

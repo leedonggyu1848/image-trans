@@ -10,6 +10,7 @@ description = 'Image Uploader'
 
 ext {
 	minioVersion = '8.6.0'
+	ulidVersion = '5.2.3'
 }
 
 java {
@@ -32,6 +33,7 @@ dependencies {
 	implementation "io.minio:minio:${minioVersion}"
 	implementation project(':common-event')
 
+	implementation "com.github.f4b6a3:ulid-creator:${ulidVersion}"
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.kafka:spring-kafka'
 	compileOnly 'org.projectlombok:lombok'

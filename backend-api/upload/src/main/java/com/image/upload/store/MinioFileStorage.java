@@ -17,7 +17,7 @@ public class MinioFileStorage implements FileStorage {
 	private String bucketName;
 
 	@Override
-	public String store(UUID imgId, String resolution, MultipartFile file) {
+	public String store(String imgId, String resolution, MultipartFile file) {
 		String accessKey = generateAccessKey(imgId, resolution);
 		try {
 			minioClient.putObject(
@@ -34,7 +34,7 @@ public class MinioFileStorage implements FileStorage {
 		return accessKey;
 	}
 
-	private String generateAccessKey(UUID imageId, String resolution) {
+	private String generateAccessKey(String imageId, String resolution) {
 		return imageId + "/" + resolution;
 	}
 }

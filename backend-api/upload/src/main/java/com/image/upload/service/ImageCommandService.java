@@ -18,24 +18,24 @@ public class ImageCommandService {
 	private final TopicName topicName;
 	private final String IMAGE_ORIGINAL = "ORIGINAL";
 
-	public void processOriginalImage(UUID imgId, String title, MultipartFile file) {
+	public void processOriginalImage(String imgId, String title, MultipartFile file) {
 		String accessKey = fileStorage.store(imgId, IMAGE_ORIGINAL, file);
 
 		sendCreatedImgObj(imgId, accessKey, IMAGE_ORIGINAL, title);
 		sendTranscodeEvent(imgId, accessKey);
 	}
 
-	private void sendTranscodeEvent(UUID imgId, String accessKey) {
+	private void sendTranscodeEvent(String imgId, String accessKey) {
 		TranscodeEvent event = TranscodeEvent.builder()
-				.imgId(imgId.toString())
+				.imgId(imgId)
 				.accessKey(accessKey)
 				.build();
 		producerService.sendMessage(topicName.getTranscode(), event);
 	}
 
-	private void sendCreatedImgObj(UUID imgId, String accessKey, String resolution, String title) {
+	private void sendCreatedImgObj(String imgId, String accessKey, String resolution, String title) {
 		CreatedEvent event = CreatedEvent.builder()
-				.imgId(imgId.toString())
+				.imgId(imgId)
 				.accessKey(accessKey)
 				.resolution(resolution)
 				.title(title)
