@@ -1,9 +1,9 @@
 version: "3.8"
 
 services:
-  download-app:
-    image: download-service:local
-    container_name: download_service
+  download:
+    image: leedong1848/image-download:latest
+    container_name: download
     env_file:
       - ./.env.example
     ports:
@@ -11,9 +11,10 @@ services:
     networks:
       - image-network
 
-  upload-app:
-    image: upload-service:local
-    container_name: upload_service
+  upload:
+    image: leedong1848/image-upload:latest
+
+    container_name: upload
     env_file:
       - ./.env.example
     ports:
