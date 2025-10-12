@@ -10,8 +10,6 @@ import {
 } from "lucide-react";
 
 // --- Configuration ---
-// 백엔드 서버의 주소를 여기에 입력하세요.
-
 const UPLOAD_API_URL = process.env.UPLOAD_API_URL || "http://localhost:8080";
 const DOWNLOAD_API_URL =
   process.env.DOWNLOAD_API_URL || "http://localhost:8081";
@@ -340,7 +338,7 @@ const ImageDetailModal = ({ metadata, onClose }) => {
 // --- Main App Component ---
 
 export default function App() {
-  const [images, setImages] = useState([]);
+  const [allImages, setAllImages] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -363,7 +361,10 @@ export default function App() {
         acc[meta.imgId].resolutions.push(meta.resolution);
         return acc;
       }, {});
-      setImages(Object.values(groupedByImgId));
+      const sortedImages = Object.values(groupedByImgId).sort((a, b) =>
+        b.imgId.localeCompare(a.imgId)
+      );
+      setAllImages(sortedImages);
     } catch (err) {
       setError(
         "Could not connect to the backend. Please ensure the server is running and accessible."
@@ -388,16 +389,16 @@ export default function App() {
     setTimeout(() => setNotification({ message: "", type: "" }), 5000);
   };
 
-  const filteredImages = useMemo(() => {
+  const displayedImages = useMemo(() => {
     if (!searchQuery) {
-      return images;
+      return allImages.slice(0, 8);
     }
-    return images.filter(
+    return allImages.filter(
       (image) =>
         image.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         image.imgId.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }, [images, searchQuery]);
+  }, [allImages, searchQuery]);
 
   return (
     <div className="bg-gray-900 min-h-screen text-gray-100 font-sans">
@@ -458,9 +459,9 @@ export default function App() {
           )}
           {!isLoading &&
             !error &&
-            (filteredImages.length > 0 ? (
+            (displayedImages.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {filteredImages.map((meta) => (
+                {displayedImages.map((meta) => (
                   <ImageCard
                     key={meta.imgId}
                     metadata={meta}
@@ -473,8 +474,9 @@ export default function App() {
                 <ImageIcon size={48} className="mx-auto mb-4" />
                 <h3 className="text-xl font-semibold">No images found</h3>
                 <p>
-                  Upload an image to get started, or try a different search
-                  term.
+                  {searchQuery
+                    ? "No images match your search term."
+                    : "Upload an image to get started."}
                 </p>
               </div>
             ))}
