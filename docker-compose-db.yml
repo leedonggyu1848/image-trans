@@ -14,3 +14,9 @@ services:
       - "${RDB_PORT-3306}:3306"
     volumes:
       - ./db/data:/var/lib/mysql
+    networks:
+      - image-network
+
+networks:
+  image-network:
+    external: true

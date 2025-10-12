@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  download-app:
+    image: download-service:local
+    container_name: download_service
+    env_file:
+      - ./.env.example
+    ports:
+      - "8081:8081"
+    networks:
+      - image-network
+
+  upload-app:
+    image: upload-service:local
+    container_name: upload_service
+    env_file:
+      - ./.env.example
+    ports:
+      - "8080:8080"
+    networks:
+      - image-network
+
+networks:
+  image-network:
+    external: true

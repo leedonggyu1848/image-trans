@@ -19,6 +19,7 @@ spring:
       ddl-auto: ${RDB_DDL:update}
     properties:
       hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
 
   kafka:
@@ -39,4 +40,4 @@ minio:
   secret-key: ${MINIO_ROOT_PASSWORD:minioadmin}
   bucket: ${MINIO_BUCKET:image-bucket}
 server:
-  port: ${PORT:8081}
+  port: ${DOWNLOAD_PORT:8081}

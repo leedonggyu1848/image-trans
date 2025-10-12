@@ -1,0 +1,1 @@
+docker network create image-network

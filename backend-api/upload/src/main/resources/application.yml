@@ -17,3 +17,5 @@ minio:
   secret-key: ${MINIO_ROOT_PASSWORD:minioadmin}
   bucket: ${MINIO_BUCKET:image-bucket}
 
+server:
+  port: ${UPLOAD_PORT:8080}

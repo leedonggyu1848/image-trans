@@ -39,7 +39,6 @@ const api = {
     if (!response.ok) throw new Error("Failed to fetch metadata");
     return response.json();
   },
-  // 수정된 부분: 이미지 URL을 가져오는 대신, 이미지를 직접 스트리밍하는 엔드포인트를 호출하도록 변경
   getImageUrl: (imageId, resolution) => {
     return `${DOWNLOAD_API_URL}/query/images/${imageId}/${resolution}`;
   },
