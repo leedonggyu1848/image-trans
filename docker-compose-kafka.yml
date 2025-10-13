@@ -22,14 +22,14 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT,EXPOSED:PLAINTEXT
       # KRaft 컨트롤러 쿼럼 설정 (단일 노드이므로 자기 자신을 가리킴)
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@broker:9094
-      # 내부 토픽 (offsets, transaction state)의 복제 계수 (개발/테스트용으로 1)
+
       # 프로덕션에서는 브로커 수에 맞게 3 이상으로 설정 권장
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       # 컨슈머 그룹 리밸런싱 지연 시간 (개발용으로 0)
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-      KAFKA_NUM_PARTITIONS: 3
+      KAFKA_NUM_PARTITIONS: 5
       # Kafka 데이터 및 로그 저장 경로
       KAFKA_LOG_DIRS: /var/lib/kafka/data
 

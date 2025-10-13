@@ -55,6 +55,6 @@ output "ssh_key_name" {
 
 output "access_bestion_host" {
   description = "베스천호스트 접속"
-  value = "ssh -i ${local_file.ssh_private_key.filename} ubuntu@${aws_instance.bastion.public_ip}"
+  value = "ssh -i ${local_file.ssh_private_key.filename} ubuntu@${aws_instance.stateful.public_ip}"
 }
 

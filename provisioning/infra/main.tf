@@ -104,52 +104,70 @@ module "eks" {
   }
 }
 
-
 # ------------------------------------------------------------------------------
 # ec2
 # ------------------------------------------------------------------------------
-resource "aws_security_group" "bastion_outbound" {
+resource "aws_security_group" "stateful" {
   name   = "${var.team_name}-stateful-sg"
   vpc_id = module.vpc.vpc_id
-
   ingress {
+    protocol    = "tcp"
     from_port   = 22
     to_port     = 22
-    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow SSH access"
   }
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-resource "aws_security_group" "bastion_inbound" {
-  name   = "${var.team_name}-stateful-sg"
-  vpc_id = module.vpc.vpc_id
 
   ingress {
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
-    cidr_blocks = [ module.vpc.vpc_cidr_block]
+    protocol    = "tcp"
+    from_port   = 20000
+    to_port     = 20100
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow custom application port range 20000-20100"
   }
-  egress {
+
+  ingress {
+    protocol    = "tcp"
+    from_port   = 80
+    to_port     = 80
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow HTTP traffic from anywhere"
+  }
+
+  ingress {
+    protocol    = "tcp"
+    from_port   = 443
+    to_port     = 443
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow HTTPS traffic from anywhere"
+  }
+
+  ingress {
+    protocol    = "-1"
     from_port   = 0
     to_port     = 0
+    cidr_blocks = [module.vpc.vpc_cidr_block]
+    description = "Allow all traffic from within the VPC"
+  }
+
+  egress {
     protocol    = "-1"
-    cidr_blocks = [ module.vpc.vpc_cidr_block]
+    from_port   = 0
+    to_port     = 0
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow all outbound traffic"
+  }
+  tags = {
+    Name = "${var.team_name}-stateful-sg"
   }
 }
 
-resource "aws_instance" "bastion" {
+resource "aws_instance" "stateful" {
   ami           = "ami-00e73adb2e2c80366"
   instance_type = "t3.medium"
   subnet_id     = module.vpc.public_subnets[0]
   key_name      = aws_key_pair.main.key_name
-  vpc_security_group_ids = [aws_security_group.bastion_inbound.id, aws_security_group.bastion_outbound.id]
+  vpc_security_group_ids = [aws_security_group.stateful.id]
   associate_public_ip_address = true
 
   tags = {
@@ -157,3 +175,42 @@ resource "aws_instance" "bastion" {
   }
 }
 
+
+# ------------------------------------------------------------------------------
+# EBS
+# ------------------------------------------------------------------------------
+
+resource "aws_ebs_volume" "stateful_data" {
+  availability_zone = aws_instance.stateful.availability_zone
+
+  size = 20
+  type = "gp3"
+
+  tags = {
+    Name = "${var.team_name}-stateful-data-volume"
+  }
+}
+
+resource "aws_volume_attachment" "ebs_att" {
+  device_name = "/dev/sdf"
+
+  volume_id = aws_ebs_volume.stateful_data.id
+  instance_id = aws_instance.stateful.id
+}
+
+resource "local_file" "ansible_inventory" {
+  depends_on = [aws_instance.stateful, local_file.ssh_private_key]
+
+  # 생성될 인벤토리 파일의 내용
+  content = <<-EOT
+    [ec2_servers]
+    ${aws_instance.stateful.public_ip}
+
+    [ec2_servers:vars]
+    ansible_user=ec2-user
+    ansible_ssh_private_key_file=${abspath(local_file.ssh_private_key.filename)}
+  EOT
+
+  # 파일 이름
+  filename = "../ansible/inventory.ini"
+}

@@ -11,7 +11,7 @@ services:
       MYSQL_USER: ${RDB_USER:-user}
       MYSQL_PASSWORD: ${RDB_PASSWORD:-pw}
     ports:
-      - "${RDB_PORT-3306}:3306"
+      - "3306:3306"
     volumes:
       - ./db/data:/var/lib/mysql
     networks:

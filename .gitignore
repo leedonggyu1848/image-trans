@@ -11,3 +11,5 @@
 .terraform*
 terraform*
 *.tfvars
+
+inventory.ini
