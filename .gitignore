@@ -6,3 +6,8 @@
 /kafka
 /minio-data
 /db
+
+.terraform/
+.terraform*
+terraform*
+*.tfvars
