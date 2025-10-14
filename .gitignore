@@ -2,6 +2,7 @@
 .gradle
 .idea
 .vim
+.env
 
 /kafka
 /minio-data
@@ -12,4 +13,5 @@
 terraform*
 *.tfvars
 
+ansible_venv
 inventory.ini
