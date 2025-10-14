@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"log/slog"
+	"strings"
 	"time"
 
 	"transcoding/config"
@@ -34,8 +35,9 @@ func NewKafkaEventReader[T any](cfg config.KafkaConfig, topicName string) (*Kafk
 		return nil, err
 	}
 
+	urls := strings.Split(cfg.URL, ",")
 	r := kafka.NewReader(kafka.ReaderConfig{
-		Brokers:  []string{cfg.URL},
+		Brokers:  urls,
 		GroupID:  cfg.GroupId,
 		Topic:    topicName,
 		MinBytes: 10e3, // 10KB
