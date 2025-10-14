@@ -101,7 +101,7 @@ services:
       - /data/minio:/data
     ports:
       - "${MINIO_UI:-9000}:9000" # API 포트
-      - "${MMINIO_UI_PORT:-9001}:9001" # 콘솔(UI) 포트
+      - "${MINIO_UI_PORT:-9001}:9001" # 콘솔(UI) 포트
     command: server /data --console-address ":9001"
     healthcheck:
       test: ["CMD", "mc", "ready", "local"]

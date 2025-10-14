@@ -14,11 +14,6 @@
     src: docker-compose.yml
     dest: /home/ubuntu/docker-compose.yml
 
-- name: 환경변수 파일(.env)을 서버에 복사
-  ansible.builtin.copy:
-    src: .env
-    dest: /home/ubuntu/.env
-
 - name: 템플릿을 사용하여 .env 파일 생성
   ansible.builtin.template:
     src: .env.j2

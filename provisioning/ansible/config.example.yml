@@ -1,0 +1,18 @@
+# 데이터베이스 (MySQL) 설정
+rdb_root_password: "supersecret"
+rdb_database: "mydatabase"
+rdb_user: "myuser"
+rdb_password: "mypassword"
+rdb_port: 3306
+
+# Kafka 클러스터 설정
+kafka_port_1: 9093
+kafka_port_2: 9094
+kafka_port_3: 9095
+kafka_ui_port: 1234
+
+# Object Storage (MinIO) 설정
+minio_root_user: "minioadmin"
+minio_root_password: "minioadmin"
+minio_api_port: 9000
+minio_ui_port: 9001

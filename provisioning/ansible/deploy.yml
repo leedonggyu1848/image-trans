@@ -1,6 +1,8 @@
 - name: Stateful 애플리케이션 서버 구성 및 배포
   hosts: ec2_servers
   gather_facts: yes
+  vars_files:
+    - config.yml
   roles:
     - setup_instance
     - docker_up
