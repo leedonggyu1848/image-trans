@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: transcoding-app-config
+data:
+  MINIO_URL: "minio:9000"
+  MINIO_ROOT_USER: "minioadmin"
+  MINIO_ROOT_PASSWORD: "minioadmin"
+  MINIO_BUCKET: "image-bucket"
+  KAFKA_URL: "broker:9092"
+  KAFKA_GROUP_ID: "transcoder-group"
+  WORKER_COUNT: "5"
+  JOB_QUEUE_SIZE: "100"
+  TRANSCODE_TOPIC: "transcode"
+  CREATED_TOPIC: "create-img"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transcoding-app-deployment
+  labels:
+    app: transcoding-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: transcoding-app
+  template:
+    metadata:
+      labels:
+        app: transcoding-app
+    spec:
+      containers:
+        - name: transcoding-worker
+          image: leedong1848/image-transcoding:latest
+
+          envFrom:
+            - configMapRef:
+                name: transcoding-app-config
