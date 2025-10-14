@@ -1,0 +1,61 @@
+- name: EBS 볼륨(/dev/sdf)을 ext4 파일시스템으로 포맷
+  community.general.filesystem:
+    fstype: ext4
+    dev: /dev/nvme1n1
+  become: yes
+
+- name: /data 디렉터리에 볼륨 마운트 및 fstab 등록
+  ansible.posix.mount:
+    path: /data
+    src: /dev/nvme1n1
+    fstype: ext4
+    state: mounted
+  become: yes
+
+- name: Docker 설치를 위한 사전 패키지 설치
+  ansible.builtin.apt:
+    name: ["ca-certificates", "curl"]
+    state: present
+    update_cache: yes
+  become: yes
+
+- name: Docker GPG 키를 저장할 디렉터리 생성
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+  become: yes
+
+- name: Docker 공식 GPG 키 추가
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    dest: /etc/apt/keyrings/docker.asc
+    mode: "a+r" # 모든 사용자가 읽을 수 있도록 권한 설정
+    force: true
+  become: yes
+
+- name: Docker APT 저장소 추가
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    state: present
+  become: yes
+
+- name: Docker 및 관련 플러그인 설치
+  ansible.builtin.apt:
+    name:
+      [
+        "docker-ce",
+        "docker-ce-cli",
+        "containerd.io",
+        "docker-buildx-plugin",
+        "docker-compose-plugin",
+      ]
+    state: present
+  become: yes
+
+- name: 현재 사용자를 docker 그룹에 추가 (sudo 없이 docker 명령어 사용)
+  ansible.builtin.user:
+    name: "{{ ansible_user }}"
+    groups: docker
+    append: yes
+  become: yes

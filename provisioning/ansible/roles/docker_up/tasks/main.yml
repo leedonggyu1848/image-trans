@@ -1,0 +1,33 @@
+- name: Docker Compose에서 사용할 볼륨 데이터 디렉터리 생성
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - /data/mysql
+    - /data/kafka
+    - /data/minio
+  become: yes
+
+- name: docker-compose.yml 파일을 서버에 복사
+  ansible.builtin.copy:
+    src: docker-compose.yml
+    dest: /home/ubuntu/docker-compose.yml
+
+- name: 환경변수 파일(.env)을 서버에 복사
+  ansible.builtin.copy:
+    src: .env
+    dest: /home/ubuntu/.env
+
+- name: 템플릿을 사용하여 .env 파일 생성
+  ansible.builtin.template:
+    src: .env.j2
+    dest: /home/ubuntu/.env
+
+- name: Docker Compose 애플리케이션 실행
+  become: yes
+  community.docker.docker_compose_v2:
+    project_src: /home/ubuntu/
+    state: present
+    env_files:
+      - /home/ubuntu/.env

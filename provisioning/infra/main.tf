@@ -39,6 +39,8 @@ module "vpc" {
   public_subnets  = ["10.0.101.0/24", "10.0.102.0/24"]
 
   enable_nat_gateway = true
+  single_nat_gateway  = false
+  one_nat_gateway_per_az = true
   enable_dns_hostnames = true
 
   tags = { "kubernetes.io/cluster/${var.team_name}-cluster" = "shared" }
@@ -207,7 +209,7 @@ resource "local_file" "ansible_inventory" {
     ${aws_instance.stateful.public_ip}
 
     [ec2_servers:vars]
-    ansible_user=ec2-user
+    ansible_user=ubuntu
     ansible_ssh_private_key_file=${abspath(local_file.ssh_private_key.filename)}
   EOT
 
