@@ -1,0 +1,7 @@
+{
+  "yaml.schemas": {
+    "file:///Users/idong-gyu/.vscode/extensions/atlassian.atlascode-3.8.18/resources/schemas/pipelines-schema.json": "bitbucket-pipelines.yml",
+    "https://www.schemastore.org/helmfile.json": "file:///Users/idong-gyu/workdir/project/image-trans/provisioning/helm/values.yml",
+    "https://www.schemastore.org/chart.json": "file:///Users/idong-gyu/workdir/project/image-trans/provisioning/helm/Chart.yml"
+  }
+}

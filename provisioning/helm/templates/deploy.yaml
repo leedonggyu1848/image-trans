@@ -1,0 +1,36 @@
+# deploy.yaml
+{{- include "trans-image.validate.requiredApps" . -}}
+
+{{- $context := deepCopy . -}}
+{{- range $appName, $app := .Values.apps -}}
+{{- $_ := set $context "appName" $appName -}}
+{{- $imagePath := printf "%s/%s:%s" $.Values.repositoryRoot $app.container.image $app.container.tag }}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "trans-image.deploy.name" $context }}
+  labels:
+    {{- include "trans-image.commonLabels" $context | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ include "trans-image.app.name" $context }}
+  template:
+    metadata:
+      labels:
+        {{- include "trans-image.commonLabels" $context | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ include "trans-image.container.name" $context }}
+          image: {{ $imagePath }}
+          {{- if $app.container.port }}
+          ports:
+            - containerPort: {{ $app.container.port }}
+          {{- end }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "trans-image.config.name" $context }}
+---
+{{ end -}}

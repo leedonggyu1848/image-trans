@@ -1,0 +1,26 @@
+# service.yaml
+{{- include "trans-image.validate.requiredApps" . -}}
+
+{{- $context := deepCopy . -}}
+{{- range $appName, $app := .Values.apps -}}
+{{- if $app.port -}}
+{{- $_ := set $context "appName" $appName }}
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "trans-image.service.name" $context }}
+  labels:
+    {{- include "trans-image.commonLabels" $context | nindent 4 }}
+spec:
+  selector:
+    app.kubernetes.io/name: {{ $appName }}
+  ports:
+    - name: http
+      port: {{ $app.port }}
+      protocol: TCP
+      targetPort: {{ $app.container.port }}
+  type: "ClusterIP"
+---
+{{ end -}}
+{{- end }}

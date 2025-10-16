@@ -1,0 +1,48 @@
+env:
+  db:
+    url: "13.125.40.128:3306"
+    dbname: "testdb"
+    user: "user"
+    password: "pw"
+
+  kafka:
+    topic:
+      create: "create-img"
+      transcode: "transcode"
+    urls:
+      - "13.125.40.128:9093"
+      - "13.125.40.128:9094"
+      - "13.125.40.128:9095"
+    ui:
+      url: "13.125.40.128:1234"
+
+  minio:
+    url: "13.125.40.128:9000"
+    user: "minioadmin"
+    password: "minioadmin"
+    bucket: "image-bucket"
+
+  transcoding:
+    jobQueueSize: 100
+    workers: 5
+    kafkaGroupId: "transcoding-group"
+
+repositoryRoot: leedong1848
+
+apps:
+  download:
+    port: 80
+    container:
+      image: image-download
+      tag: latest
+      port: 8080
+  upload:
+    port: 80
+    container:
+      image: image-upload
+      tag: latest
+      port: 8080
+  transcoding:
+    container:
+      image: image-transcoding
+      tag: latest

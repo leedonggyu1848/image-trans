@@ -1,0 +1,215 @@
+---
+# Source: image-trans/templates/download-config.yaml
+# download-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    helm.sh/chart: "image-trans-chart-0.1.0"
+    app.kubernetes.io/part-of: "image-trans"
+    app.kubernetes.io/name: "download"
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+    app: "download-app"
+  name: download-app-config
+data:
+  CREATED_TOPIC: "create-img"
+  KAFKA_URL: "13.125.40.128:9093,13.125.40.128:9094,13.125.40.128:9095"
+  RDB_URL: "mysql:// 13.125.40.128:3306 / testdb"
+  RDB_USER: "user"
+  RDB_PASSWORD: "pw"
+  RDB_DRIVER_CLASS: "com.mysql.cj.jdbc.Driver"
+  RDB_DDL: "update"
+  MINIO_URL: "http:// 13.125.40.128:9000"
+  MINIO_ROOT_USER: minioadmin
+  MINIO_ROOT_PASSWORD: "minioadmin"
+  MINIO_BUCKET: "image-bucket"
+  DOWNLOAD_PORT: "8080"
+---
+# Source: image-trans/templates/transcoding-config.yaml
+# transcoding-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: transcoding-app-config
+data:
+  CREATED_TOPIC: "create-img"
+  TRANSCODE_TOPIC: "transcode"
+  KAFKA_URL: "13.125.40.128:9093,13.125.40.128:9094,13.125.40.128:9095"
+  MINIO_URL: "http:// 13.125.40.128:9000"
+  MINIO_ROOT_USER: "minioadmin"
+  MINIO_ROOT_PASSWORD: "minioadmin"
+  MINIO_BUCKET: "image-bucket"
+  KAFKA_GROUP_ID: "transcoding-group"
+  JOB_QUEUE_SIZE: "100"
+  WORKER_COUNT: "5"
+---
+# Source: image-trans/templates/upload-config.yaml
+# upload-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: upload-app-config
+data:
+  CREATED_TOPIC: "create-img"
+  TRANSCODE_TOPIC: "transcode"
+  KAFKA_URL: "13.125.40.128:9093,13.125.40.128:9094,13.125.40.128:9095"
+  MINIO_URL: "http:// 13.125.40.128:9000"
+  MINIO_ROOT_USER: "minioadmin"
+  MINIO_ROOT_PASSWORD: "minioadmin"
+  MINIO_BUCKET: "image-bucket"
+  UPLOAD_PORT: "8080"
+---
+# Source: image-trans/templates/service.yaml
+# service.yamlmap[container:map[image:download port:8080 tag:latest] port:80]map[container:map[image:upload port:8080 tag:latest] port:80]map[container:map[image:transcoding tag:latest]]
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: download-app-service
+  labels:
+    helm.sh/chart: "image-trans-chart-0.1.0"
+    app.kubernetes.io/part-of: "image-trans"
+    app.kubernetes.io/name: "download"
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+    app: "download-app"
+spec:
+  selector:
+    app.kubernetes.io/name: download
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8080
+  type: "ClusterIP"
+---
+# Source: image-trans/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: upload-app-service
+  labels:
+    helm.sh/chart: "image-trans-chart-0.1.0"
+    app.kubernetes.io/part-of: "image-trans"
+    app.kubernetes.io/name: "upload"
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+    app: "upload-app"
+spec:
+  selector:
+    app.kubernetes.io/name: upload
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8080
+  type: "ClusterIP"
+---
+# Source: image-trans/templates/deploy.yaml
+# deploy.yamlmap[container:map[image:download port:8080 tag:latest] port:80]map[container:map[image:upload port:8080 tag:latest] port:80]map[container:map[image:transcoding tag:latest]]
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: download-app-deployment
+  labels:
+    helm.sh/chart: "image-trans-chart-0.1.0"
+    app.kubernetes.io/part-of: "image-trans"
+    app.kubernetes.io/name: "download"
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+    app: "download-app"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: download-app
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: "image-trans-chart-0.1.0"
+        app.kubernetes.io/part-of: "image-trans"
+        app.kubernetes.io/name: "download"
+        app.kubernetes.io/version: "0.1.0"
+        app.kubernetes.io/managed-by: Helm
+        app: "download-app"
+    spec:
+      containers:
+        - name: download-app-container
+          image: leedong1848/download:latest
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: download-app-config
+---
+# Source: image-trans/templates/deploy.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transcoding-app-deployment
+  labels:
+    helm.sh/chart: "image-trans-chart-0.1.0"
+    app.kubernetes.io/part-of: "image-trans"
+    app.kubernetes.io/name: "transcoding"
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+    app: "transcoding-app"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: transcoding-app
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: "image-trans-chart-0.1.0"
+        app.kubernetes.io/part-of: "image-trans"
+        app.kubernetes.io/name: "transcoding"
+        app.kubernetes.io/version: "0.1.0"
+        app.kubernetes.io/managed-by: Helm
+        app: "transcoding-app"
+    spec:
+      containers:
+        - name: transcoding-app-container
+          image: leedong1848/transcoding:latest
+          envFrom:
+            - configMapRef:
+                name: transcoding-app-config
+---
+# Source: image-trans/templates/deploy.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: upload-app-deployment
+  labels:
+    helm.sh/chart: "image-trans-chart-0.1.0"
+    app.kubernetes.io/part-of: "image-trans"
+    app.kubernetes.io/name: "upload"
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+    app: "upload-app"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: upload-app
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: "image-trans-chart-0.1.0"
+        app.kubernetes.io/part-of: "image-trans"
+        app.kubernetes.io/name: "upload"
+        app.kubernetes.io/version: "0.1.0"
+        app.kubernetes.io/managed-by: Helm
+        app: "upload-app"
+    spec:
+      containers:
+        - name: upload-app-container
+          image: leedong1848/upload:latest
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: upload-app-config

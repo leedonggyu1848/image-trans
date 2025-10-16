@@ -1,0 +1,27 @@
+# transcoding-config.yaml
+{{ $global := . -}}
+{{- $context := set $global "appName" "transcoding" -}}
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "trans-image.config.name" $context }}
+data:
+  {{- with .Values.env.kafka }}
+  CREATED_TOPIC: {{ .topic.create | quote }}
+  TRANSCODE_TOPIC: {{ .topic.transcode | quote }}
+  KAFKA_URL: {{ join "," .urls | quote}}
+  {{- end -}}
+
+  {{- with .Values.env.minio }}
+  MINIO_URL: {{ cat "http://" .url | quote }}
+  MINIO_ROOT_USER: {{ .user | quote }}
+  MINIO_ROOT_PASSWORD: {{ .password | quote }}
+  MINIO_BUCKET: {{ .bucket | quote }}
+  {{- end -}}
+
+  {{- with .Values.env.transcoding}}
+  KAFKA_GROUP_ID: {{ .kafkaGroupId | quote }}
+  JOB_QUEUE_SIZE: {{ .jobQueueSize | quote }}
+  WORKER_COUNT: {{ .workers | quote }}
+  {{- end -}}

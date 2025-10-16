@@ -1,0 +1,34 @@
+# download-config.yaml
+{{ $global := . -}}
+{{- $context := set $global "appName" "download" -}}
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    {{- include "trans-image.commonLabels" $context | nindent 4 }}
+  name: {{ include "trans-image.config.name" $context }}
+data:
+  {{- with .Values.env.kafka }}
+  CREATED_TOPIC: {{ .topic.create | quote }}
+  KAFKA_URL: {{ join "," .urls | quote}}
+  {{- end -}}
+
+  {{- with .Values.env.db }}
+  RDB_URL: {{ cat "mysql://" .url "/" .dbname | quote}}
+  RDB_USER: {{ .user | quote }}
+  RDB_PASSWORD: {{ .password | quote }}
+  RDB_DRIVER_CLASS: "com.mysql.cj.jdbc.Driver"
+  RDB_DDL: "update"
+  {{- end -}}
+
+  {{- with .Values.env.minio }}
+  MINIO_URL: {{ cat "http://" .url | quote }}
+  MINIO_ROOT_USER: {{ .user }}
+  MINIO_ROOT_PASSWORD: {{ .password | quote }}
+  MINIO_BUCKET: {{ .bucket | quote }}
+  {{- end -}}
+
+  {{- with .Values.apps }}
+  DOWNLOAD_PORT: {{ .download.container.port | quote }}
+  {{- end -}}

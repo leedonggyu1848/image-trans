@@ -1,0 +1,19 @@
+apiVersion: v2
+name: image-trans
+description: A Helm chart for an image transcoding service
+
+type: application
+
+version: 0.1.0
+
+appVersion: "1.0.0"
+
+keywords:
+  - media
+  - transcoding
+  - kafka
+  - minio
+
+maintainers:
+  - name: dong
+    email: leedong1848@gmail.com
