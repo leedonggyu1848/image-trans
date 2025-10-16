@@ -14,7 +14,7 @@ data:
   {{- end -}}
 
   {{- with .Values.env.minio }}
-  MINIO_URL: {{ include "trans-image-format.miniourl" . }}
+  MINIO_URL: {{ .url }}
   MINIO_ROOT_USER: {{ .user | quote }}
   MINIO_ROOT_PASSWORD: {{ .password | quote }}
   MINIO_BUCKET: {{ .bucket | quote }}
