@@ -36,6 +36,7 @@ func NewKafkaEventReader[T any](cfg config.KafkaConfig, topicName string) (*Kafk
 	}
 
 	urls := strings.Split(cfg.URL, ",")
+	slog.Info("Kafka URLs parsed:", "urls", urls)
 	r := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:  urls,
 		GroupID:  cfg.GroupId,
