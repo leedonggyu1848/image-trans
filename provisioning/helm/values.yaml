@@ -1,6 +1,6 @@
 env:
   db:
-    url: "10.0.101.150"
+    url: "10.0.101.150:3306"
     dbname: "testdb"
     user: "user"
     password: "pw"

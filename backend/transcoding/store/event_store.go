@@ -24,10 +24,10 @@ func testConnection(urls []string) error {
 	defer cancel()
 	for _, url := range urls {
 		conn, err := kafka.DialContext(ctx, "tcp", url)
-		defer conn.Close()
 		if err != nil {
 			slog.Error("failed to connect to kafka", "error", err)
 		} else {
+			defer conn.Close()
 			return nil
 		}
 	}
