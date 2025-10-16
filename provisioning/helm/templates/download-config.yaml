@@ -15,7 +15,7 @@ data:
   {{- end -}}
 
   {{- with .Values.env.db }}
-  RDB_URL: {{ cat "mysql://" .url "/" .dbname | quote}}
+  RDB_URL: {{ include "trans-image-format.dburl" . }}
   RDB_USER: {{ .user | quote }}
   RDB_PASSWORD: {{ .password | quote }}
   RDB_DRIVER_CLASS: "com.mysql.cj.jdbc.Driver"
@@ -23,7 +23,7 @@ data:
   {{- end -}}
 
   {{- with .Values.env.minio }}
-  MINIO_URL: {{ cat "http://" .url | quote }}
+  MINIO_URL: {{ include "trans-image-format.miniourl" . }}
   MINIO_ROOT_USER: {{ .user }}
   MINIO_ROOT_PASSWORD: {{ .password | quote }}
   MINIO_BUCKET: {{ .bucket | quote }}
