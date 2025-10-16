@@ -1,0 +1,33 @@
+{{ $global := deepCopy . -}}
+{{- $context := set $global "appName" .Chart.Name -}}
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ include "trans-image.httproute.name" $context }}
+  labels: {{ include "trans-image.commonLabels" $context | nindent 4 }}
+spec:
+  {{ if $.Values.gw.domainName -}}
+  hostnames:
+    - {{ $.Values.gw.domainName }}
+  {{- end }}
+  parentRefs:
+    - name: {{ include "trans-image.gateway.name" $context }}
+  rules:
+{{ range $appName, $app := .Values.apps -}}
+{{- if $app.container.port }}
+    - matches:
+        - path:
+            type: PathPrefix
+            value: {{ printf "/%s" $appName }}
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
+      backendRefs:
+        - name: {{ include "trans-image.service.name" (dict "appName" $appName) }}
+          port: 80
+{{- end -}}
+{{- end -}}

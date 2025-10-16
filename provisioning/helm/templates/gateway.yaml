@@ -1,0 +1,39 @@
+{{ $global := deepCopy . -}}
+{{- $context := set $global "appName" .Chart.Name -}}
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: {{ include "trans-image.gateway.name" $context }}
+  labels: {{- include "trans-image.commonLabels" $context | nindent 4 }}
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-name: {{ printf "%s-lb" $.Chart.Name }}
+    service.beta.kubernetes.io/aws-load-balancer-type: external
+    service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+    {{ if $.Values.gw.certArn -}}
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: {{ $.Values.gw.certArn }}
+    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443"
+    {{- end }}
+
+spec:
+  gatewayClassName: istio
+  listeners:
+    - name: http
+      {{ if $.Values.gw.domainName -}}
+      hostname: {{ $.Values.gw.domainName }}
+      {{- end }}
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: Same
+
+    {{ if $.Values.gw.certArn -}}
+    - name: https
+      hostname: {{ $.Values.gw.domainName }}
+      port: 443
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: Same
+    {{- end }}

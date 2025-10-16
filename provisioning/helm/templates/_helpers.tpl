@@ -33,6 +33,15 @@ app: {{ include "trans-image.app.name" . | quote}}
 {{- printf "%s-config" (include "trans-image.app.name" .) -}}
 {{- end -}}
 
+{{- define "trans-image.gateway.name" -}}
+{{- printf "%s-gw" (include "trans-image.app.name" .) -}}
+{{- end -}}
+
+{{- define "trans-image.httproute.name" -}}
+{{- printf "%s-httproute" (include "trans-image.app.name" .) -}}
+{{- end -}}
+
+
 {{- define "trans-image-format.dburl" -}}
 {{- printf "mysql://%s/%s" .url .dbname | quote -}}
 {{- end -}}

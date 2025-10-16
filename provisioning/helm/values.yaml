@@ -1,9 +1,9 @@
 env:
   db:
     url: "10.0.101.150:3306"
-    dbname: "testdb"
-    user: "user"
-    password: "pw"
+    dbname: "mydatabase"
+    user: "myuser"
+    password: "mypassword"
 
   kafka:
     topic:
@@ -31,13 +31,11 @@ repositoryRoot: leedong1848
 
 apps:
   download:
-    port: 80
     container:
       image: image-download
       tag: latest
       port: 8080
   upload:
-    port: 80
     container:
       image: image-upload
       tag: latest
@@ -46,3 +44,7 @@ apps:
     container:
       image: image-transcoding
       tag: latest
+
+gw:
+  certArn: "arn:aws:acm:ap-northeast-2:622703417916:certificate/d14d598b-3399-4180-9c8e-f9fb009f3075"
+  domainName: "api-dong.neves-box.com"

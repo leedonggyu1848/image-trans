@@ -3,7 +3,7 @@
 
 {{- $context := deepCopy . -}}
 {{- range $appName, $app := .Values.apps -}}
-{{- if $app.port -}}
+{{- if $app.container.port -}}
 {{- $_ := set $context "appName" $appName }}
 
 apiVersion: v1
@@ -17,7 +17,7 @@ spec:
     app.kubernetes.io/name: {{ $appName }}
   ports:
     - name: http
-      port: {{ $app.port }}
+      port: 80
       protocol: TCP
       targetPort: {{ $app.container.port }}
   type: "ClusterIP"
