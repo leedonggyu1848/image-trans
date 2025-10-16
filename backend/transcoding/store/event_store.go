@@ -91,12 +91,13 @@ type KafkaEventWriter[T any] struct {
 }
 
 func NewKafkaEventWriter[T any](cfg config.KafkaConfig, topicName string) (*KafkaEventWriter[T], error) {
-	if err := testConnection(cfg.URL); err != nil {
+	urls := strings.Split(cfg.URL, ",")
+	if err := testConnection(urls); err != nil {
 		return nil, err
 	}
 
 	w := &kafka.Writer{
-		Addr:     kafka.TCP(cfg.URL),
+		Addr:     kafka.TCP(urls...),
 		Topic:    topicName,
 		Balancer: &kafka.LeastBytes{},
 	}
