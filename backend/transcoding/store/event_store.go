@@ -3,6 +3,7 @@ package store
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log/slog"
 	"strings"
 	"time"
@@ -17,26 +18,28 @@ type KafkaEventReader[T any] struct {
 	reader *kafka.Reader
 }
 
-func testConnection(url string) error {
+func testConnection(urls []string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	slog.Info("try to connect to kafka", "url", url)
+	slog.Info("try to connect to kafka", "urls", urls)
 	defer cancel()
-	conn, err := kafka.DialContext(ctx, "tcp", url)
-	if err != nil {
-		slog.Error("failed to connect to kafka", "error", err)
-		return err
+	for _, url := range urls {
+		conn, err := kafka.DialContext(ctx, "tcp", url)
+		defer conn.Close()
+		if err != nil {
+			slog.Error("failed to connect to kafka", "error", err)
+		} else {
+			return nil
+		}
 	}
-	conn.Close()
-	return nil
+	return fmt.Errorf("failed to connection from all kafka urls: %v", urls)
 }
 
 func NewKafkaEventReader[T any](cfg config.KafkaConfig, topicName string) (*KafkaEventReader[T], error) {
-	if err := testConnection(cfg.URL); err != nil {
+	urls := strings.Split(cfg.URL, ",")
+	if err := testConnection(urls); err != nil {
 		return nil, err
 	}
 
-	urls := strings.Split(cfg.URL, ",")
-	slog.Info("Kafka URLs parsed:", "urls", urls)
 	r := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:  urls,
 		GroupID:  cfg.GroupId,
