@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	"os"
 	"strconv"
+	"strings"
 	"sync"
 )
 
@@ -22,7 +23,7 @@ type MinioConfig struct {
 }
 
 type KafkaConfig struct {
-    URL      string
+    URLs      []string
     GroupId  string
 }
 
@@ -50,6 +51,7 @@ func GetMinioConfig() MinioConfig {
 			SecretAccessKey: getEnv("MINIO_ROOT_PASSWORD", "minioadmin"),
 			BucketName:      getEnv("MINIO_BUCKET", "image-bucket"),
 		}
+        slog.Info("minio config", "url", minioConfig.URL, "AccessKeyId", minioConfig.AccessKeyID, "BucketName", minioConfig.BucketName)
     }
 
 	return *minioConfig
@@ -59,11 +61,13 @@ func GetKafkaConfig() KafkaConfig {
     slog.Info("called GetKafkaConfig")
     if kafkaConfig == nil {
         slog.Info("Loading Kafka configuration from environment variables")
+        urlsRaw := getEnv("KAFKA_URL", "localhost:9093")
+        urls := strings.Split(urlsRaw, ",")
         kafkaConfig = &KafkaConfig{
-            URL:     getEnv("KAFKA_URL", "localhost:9093"),
+            URLs:     urls,
             GroupId: getEnv("KAFKA_GROUP_ID", "transcoder-group"),
         }
-        slog.Info("kafka url:", "url", kafkaConfig.URL)
+        slog.Info("kafka config", "urls", kafkaConfig.URLs, "GroupId", kafkaConfig.GroupId)
     }
 
     return *kafkaConfig

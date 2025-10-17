@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log/slog"
-	"strings"
 	"time"
 
 	"transcoding/config"
@@ -18,11 +17,11 @@ type KafkaEventReader[T any] struct {
 	reader *kafka.Reader
 }
 
-func testConnection(urls []string) error {
+func testConnection(cfg config.KafkaConfig) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	slog.Info("try to connect to kafka", "urls", urls)
+	slog.Info("try to connect to kafka", "urls", cfg.URLs)
 	defer cancel()
-	for _, url := range urls {
+	for _, url := range cfg.URLs {
 		conn, err := kafka.DialContext(ctx, "tcp", url)
 		if err != nil {
 			slog.Error("failed to connect to kafka", "error", err)
@@ -31,17 +30,16 @@ func testConnection(urls []string) error {
 			return nil
 		}
 	}
-	return fmt.Errorf("failed to connection from all kafka urls: %v", urls)
+	return fmt.Errorf("failed to connection from all kafka urls: %v", cfg.URLs)
 }
 
 func NewKafkaEventReader[T any](cfg config.KafkaConfig, topicName string) (*KafkaEventReader[T], error) {
-	urls := strings.Split(cfg.URL, ",")
-	if err := testConnection(urls); err != nil {
+	if err := testConnection(cfg); err != nil {
 		return nil, err
 	}
 
 	r := kafka.NewReader(kafka.ReaderConfig{
-		Brokers:  urls,
+		Brokers:  cfg.URLs,
 		GroupID:  cfg.GroupId,
 		Topic:    topicName,
 		MinBytes: 10e3, // 10KB
@@ -91,13 +89,12 @@ type KafkaEventWriter[T any] struct {
 }
 
 func NewKafkaEventWriter[T any](cfg config.KafkaConfig, topicName string) (*KafkaEventWriter[T], error) {
-	urls := strings.Split(cfg.URL, ",")
-	if err := testConnection(urls); err != nil {
+	if err := testConnection(cfg); err != nil {
 		return nil, err
 	}
 
 	w := &kafka.Writer{
-		Addr:     kafka.TCP(urls...),
+		Addr:     kafka.TCP(cfg.URLs...),
 		Topic:    topicName,
 		Balancer: &kafka.LeastBytes{},
 	}
