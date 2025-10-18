@@ -36,6 +36,12 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
+    healthcheck:
+      test: nc -z broker-1 9092 || exit -1
+      interval: 10s
+      timeout: 60s
+      retries: 5
+      start_period: 10s
 
   broker-2:
     image: apache/kafka:latest
@@ -56,6 +62,13 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
+    healthcheck:
+      test: nc -z broker-2 9092 || exit -1
+      interval: 10s
+      timeout: 60s
+      retries: 5
+      start_period: 10s
+
 
   broker-3:
     image: apache/kafka:latest
@@ -76,6 +89,30 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
+    healthcheck:
+      test: nc -z broker-3 9092 || exit -1
+      interval: 10s
+      timeout: 60s
+      retries: 5
+      start_period: 10s
+
+
+  kafka-exporter:
+    image: danielqsj/kafka-exporter:v1.7.0
+    hostname: kafka-exporter
+    command:
+      - --kafka.server=broker-1:9092
+      - --kafka.server=broker-2:9092
+      - --kafka.server=broker-3:9092
+    ports:
+      - "${KAFKA_EXPORTER_PORT:-9308}:9308"
+    depends_on:
+      broker-1:
+        condition: service_healthy
+      broker-2:
+        condition: service_healthy
+      broker-3:
+        condition: service_healthy
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
@@ -87,9 +124,12 @@ services:
       KAFKA_CLUSTERS_0_NAME: local-kafka-cluster
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: broker-1:9092,broker-2:9092,broker-3:9092
     depends_on:
-      - broker-1
-      - broker-2
-      - broker-3
+      broker-1:
+        condition: service_healthy
+      broker-2:
+        condition: service_healthy
+      broker-3:
+        condition: service_healthy
   # -------------------- OBJECT STORAGE --------------------
   minio:
     image: minio/minio:RELEASE.2025-09-07T16-13-09Z-cpuv1

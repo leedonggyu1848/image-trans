@@ -1,6 +1,6 @@
 env:
   db:
-    url: "10.0.101.150:3306"
+    url: "10.0.101.24:3306"
     dbname: "mydatabase"
     user: "myuser"
     password: "mypassword"
@@ -10,14 +10,14 @@ env:
       create: "create-img"
       transcode: "transcode"
     urls:
-      - "10.0.101.150:9093"
-      - "10.0.101.150:9094"
-      - "10.0.101.150:9095"
+      - "10.0.101.24:9093"
+      - "10.0.101.24:9094"
+      - "10.0.101.24:9095"
     ui:
-      url: "10.0.101.150:1234"
+      url: "10.0.101.24:1234"
 
   minio:
-    url: "10.0.101.150:9000"
+    url: "10.0.101.24:9000"
     user: "minioadmin"
     password: "minioadmin"
     bucket: "image-bucket"

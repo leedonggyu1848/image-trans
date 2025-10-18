@@ -10,6 +10,7 @@ kafka_port_1: 9093
 kafka_port_2: 9094
 kafka_port_3: 9095
 kafka_ui_port: 1234
+kafka_exporter_port: 1235
 
 # Object Storage (MinIO) 설정
 minio_root_user: "minioadmin"
