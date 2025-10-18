@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"sync"
 	"syscall"
+	"time"
 
 	"transcoding/config"
 	"transcoding/event"
@@ -83,6 +84,7 @@ func main() {
 				if err := eventReader.CommitEvent(ctx, msg); err != nil {
 					slog.Info("failed to commit messages: ", "err", err)
 				}
+				time.Sleep(time.Second * 3)
 			}
 		}
 	}()
