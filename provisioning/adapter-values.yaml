@@ -1,0 +1,12 @@
+prometheus:
+  url: http://prometheus.istio-system.svc.cluster.local
+  port: 9090
+rules:
+  external:
+    - seriesQuery: '{__name__="kafka_consumergroup_lag_sum"}'
+      resources:
+        namespaced: false
+      name:
+        matches: "^(.*)_sum$"
+        as: "kafka_consumergroup_lag"
+      metricsQuery: 'sum(<<.Series>>{topic="transcode", consumergroup="transcoding-group"})'
