@@ -194,7 +194,7 @@ resource "aws_security_group" "stateful" {
 
 resource "aws_instance" "stateful" {
   ami           = "ami-00e73adb2e2c80366"
-  instance_type = "t3.medium"
+  instance_type = "t3.large"
   subnet_id     = module.vpc.public_subnets[0]
   key_name      = aws_key_pair.main.key_name
   vpc_security_group_ids = [aws_security_group.stateful.id]
